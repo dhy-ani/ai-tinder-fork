@@ -1,5 +1,7 @@
 node_modules/
+coverage/
 tinder.db
 tinder.db-shm
 tinder.db-wal
 *.db
+.specstory/
