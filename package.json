@@ -5,11 +5,16 @@
     "main": "server.js",
     "scripts": {
         "start": "node server.js",
-        "dev": "node server.js"
+        "dev": "node server.js",
+        "test": "jest --verbose"
     },
     "dependencies": {
         "better-sqlite3": "^12.6.2",
         "cors": "^2.8.5",
         "express": "^4.19.2"
+    },
+    "devDependencies": {
+        "jest": "^30.3.0",
+        "supertest": "^7.2.2"
     }
 }
