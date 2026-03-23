@@ -112,4 +112,79 @@ describe("AI Tinder backend edge cases", () => {
   test("hydrateRow handles null gracefully", () => {
     expect(hydrateRow(null)).toBeNull();
   });
+
+  test("GET /api/likes returns empty list when no likes", async () => {
+    const res = await request(app).get("/api/likes");
+    expect(res.status).toBe(200);
+    expect(res.body.likes).toEqual([]);
+    expect(res.body.count).toBe(0);
+  });
+
+  test("DELETE non-existent like returns ok removed false", async () => {
+    const res = await request(app).delete("/api/likes/nonexistent");
+    expect(res.status).toBe(200);
+    expect(res.body.ok).toBe(true);
+    expect(res.body.removed).toBe(false);
+  });
+
+  test("POST /api/likes with null values does not throw", async () => {
+    jest.spyOn(Math, "random").mockReturnValue(0.9);
+    const res = await request(app)
+      .post("/api/likes")
+      .send({ profileId: "p_7", action: "like", name: null, tags: null, img: null });
+    expect(res.status).toBe(201);
+    expect(res.body.ok).toBe(true);
+    Math.random.mockRestore();
+  });
+
+  test.each([
+    ["p_8", "like"],
+    ["p_9", "superlike"],
+    ["p_10", "like"],
+    ["p_11", "superlike"],
+    ["p_12", "like"],
+    ["p_13", "superlike"],
+    ["p_14", "like"],
+    ["p_15", "superlike"],
+    ["p_16", "like"],
+    ["p_17", "superlike"]
+  ])("POST /api/likes with action %s should return ok", async (id, action) => {
+    jest.spyOn(Math, "random").mockReturnValue(0.99);
+    const res = await request(app)
+      .post("/api/likes")
+      .send({ profileId: id, action, name: "User", tags: ["Test"] });
+    expect(res.status).toBe(201);
+    expect(res.body.ok).toBe(true);
+    Math.random.mockRestore();
+  });
+
+  test("GET /api/matches?all=true returns 0 when no matches", async () => {
+    const res = await request(app).get("/api/matches?all=true");
+    expect(res.status).toBe(200);
+    expect(res.body.newMatches).toEqual([]);
+    expect(res.body.totalMatches).toBe(0);
+  });
+
+  test("saveLikeAndTryMatch with empty tags uses [] gracefully", () => {
+    jest.spyOn(Math, "random").mockReturnValue(0.4);
+    const result = saveLikeAndTryMatch("p_18", "Sunny", "like", "", null);
+    expect(result.inserted).toBe(true);
+    expect(result.matched).toBe(true);
+    Math.random.mockRestore();
+  });
+
+  test("saveLikeAndTryMatch with unknown action does not throw but won't match", () => {
+    expect(() => saveLikeAndTryMatch("p_19", "Alex", "poke", "", [])).not.toThrow();
+  });
+
+  test("multiple likes and matches total count increments correctly", async () => {
+    jest.spyOn(Math, "random").mockReturnValue(0.05);
+    await request(app).post("/api/likes").send({ profileId: "p_20", action: "like", name: "A" });
+    await request(app).post("/api/likes").send({ profileId: "p_21", action: "superlike", name: "B" });
+
+    const res = await request(app).get("/api/matches");
+    expect(res.body.newMatches.length).toBe(2);
+    expect(res.body.totalMatches).toBe(2);
+    Math.random.mockRestore();
+  });
 });

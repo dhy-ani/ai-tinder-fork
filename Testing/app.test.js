@@ -108,3 +108,50 @@ test("queueMatch handles multiple matches sequentially", () => {
   expect(matchCount.textContent).toBe('2');
 });
 
+test.each(Array.from({ length: 20 }, (_, i) => i + 1))(
+  "generateProfiles(%i) returns %i profiles",
+  (count) => {
+    const profiles = app.generateProfiles(count);
+    expect(profiles).toHaveLength(count);
+    profiles.forEach(p => {
+      expect(p).toEqual(expect.objectContaining({ id: expect.any(String), name: expect.any(String) }));
+    });
+  }
+);
+
+test("pickTags generates 50 different arrays with valid values", () => {
+  const sets = new Set();
+  for (let i = 0; i < 50; i++) {
+    const tags = app.pickTags();
+    expect(tags.length).toBeLessThanOrEqual(4);
+    expect(new Set(tags).size).toBe(tags.length);
+    sets.add(tags.join(","));
+  }
+  expect(sets.size).toBeGreaterThan(5);
+});
+
+test("resetDeck generates 12 cards in DOM", () => {
+  app.resetDeck();
+  const cards = document.querySelectorAll('.card');
+  expect(cards.length).toBe(12);
+});
+
+test("initCards sets topCard to first card", () => {
+  app.resetDeck();
+  expect(app.topCard).not.toBeNull();
+});
+
+test("handleNextPhoto does not throw for null card", () => {
+  expect(() => app.handleNextPhoto(null)).not.toThrow();
+});
+
+test("removeCard safely removes card after delay", () => {
+  const card = document.createElement('div');
+  const deck = document.getElementById('deck');
+  deck.appendChild(card);
+  app.removeCard(card);
+  jest.advanceTimersByTime(220);
+  expect(deck.contains(card)).toBe(false);
+});
+
+
