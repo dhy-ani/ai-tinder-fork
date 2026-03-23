@@ -90,6 +90,11 @@ function hydrateRow(row) {
     };
 }
 
+function resetDatabase() {
+    db.exec("DELETE FROM matches;");
+    db.exec("DELETE FROM likes;");
+}
+
 /**
  * Persist a like and attempt to create a mutual match.
  * Returns { inserted, matched }
@@ -227,10 +232,19 @@ process.on("SIGTERM", () => { db.close(); process.exit(0); });
 
 // ─── Boot ─────────────────────────────────────────────────────────────────────
 
-app.listen(PORT, () => {
-    console.log(`\n🔥 AI-Tinder backend  →  http://localhost:${PORT}`);
-    console.log(`   POST   /api/likes          record a like`);
-    console.log(`   GET    /api/matches        poll for new matches`);
-    console.log(`   GET    /api/likes          inspect the likes DB`);
-    console.log(`   DELETE /api/likes/:id      remove a like\n`);
-});
+if (require.main === module) {
+    app.listen(PORT, () => {
+        console.log(`\n🔥 AI-Tinder backend  →  http://localhost:${PORT}`);
+        console.log(`   POST   /api/likes          record a like`);
+        console.log(`   GET    /api/matches        poll for new matches`);
+        console.log(`   GET    /api/likes          inspect the likes DB`);
+        console.log(`   DELETE /api/likes/:id      remove a like\n`);
+    });
+}
+
+module.exports = {
+    app,
+    saveLikeAndTryMatch,
+    hydrateRow,
+    resetDatabase,
+};

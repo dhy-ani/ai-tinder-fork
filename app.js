@@ -397,3 +397,29 @@ shuffleBtn.addEventListener("click", resetDeck);
 // ─── Boot ─────────────────────────────────────────────────────────────────────
 resetDeck();
 startPolling();
+
+if (typeof module !== "undefined" && module.exports) {
+  module.exports = {
+    sample,
+    pickTags,
+    imgFor,
+    generateProfiles,
+    renderDeck,
+    resetDeck,
+    initCards,
+    handleNextPhoto,
+    recordLike,
+    showInstantMatch,
+    queueMatch,
+    drainMatchQueue,
+    showMatchBanner,
+    hideBanner,
+    pollMatches,
+    startPolling,
+    handleReject,
+    handleLike,
+    handleSuperLike,
+    removeCard,
+    handlePointerUp,
+  };
+}

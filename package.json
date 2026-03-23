@@ -5,11 +5,17 @@
     "main": "server.js",
     "scripts": {
         "start": "node server.js",
-        "dev": "node server.js"
+        "dev": "node server.js",
+        "test": "jest --runInBand"
     },
     "dependencies": {
         "better-sqlite3": "^12.6.2",
         "cors": "^2.8.5",
         "express": "^4.19.2"
+    },
+    "devDependencies": {
+        "jest": "^29.0.0",
+        "jest-environment-jsdom": "^30.3.0",
+        "supertest": "^6.3.3"
     }
 }
